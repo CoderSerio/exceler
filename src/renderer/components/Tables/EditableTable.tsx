@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { InputRef, Space } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
@@ -5,12 +6,14 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
-interface Item {
-  key: string;
-  name: string;
-  age: string;
-  address: string;
+interface TableItem {
+  [key: string]: string | boolean
 }
+
+interface TableTitle {
+  [key: string]: any
+}
+
 
 interface EditableRowProps {
   index: number;
@@ -31,9 +34,9 @@ interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
   children: React.ReactNode;
-  dataIndex: keyof Item;
-  record: Item;
-  handleSave: (record: Item) => void;
+  dataIndex: string;
+  record: TableItem;
+  handleSave: (record: TableItem) => void;
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -106,6 +109,8 @@ interface DataType {
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
 export const EditableTable = () => {
+  // 标题
+
   const [dataSource, setDataSource] = useState<DataType[]>([
     {
       key: '0',
@@ -117,21 +122,19 @@ export const EditableTable = () => {
       key: '1',
       name: 'Edward King 1',
       address: 'London, Park Lane no. 1',
+      test: '123123'
     },
   ]);
-
-  const [count, setCount] = useState(2);
-
-  const handleDelete = (key: React.Key) => {
-    const newData = dataSource.filter(item => item.key !== key);
-    setDataSource(newData);
-  };
-
-  const defaultColumns: (ColumnTypes[number] & { editable?: boolean; dataIndex: string })[] = [
+  // 标题字段
+  const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([
     {
       title: 'name',
       dataIndex: 'name',
-      width: '30%',
+      editable: true,
+    },
+    {
+      title: '3',
+      dataIndex: '3',
       editable: true,
     },
     {
@@ -144,10 +147,13 @@ export const EditableTable = () => {
       dataIndex: 'address',
       editable: true,
     },
-    {
+  ]);
+
+  const generateTableField = () => {
+    const operationFields = {
       title: 'operation',
       dataIndex: 'operation',
-      render: (_, value, key) =>
+      render: (_: any, value: any, key: any) =>
         <>
           {dataSource.length >= 1 ? (
             <Popconfirm title="确定要删除吗" onConfirm={() => handleDelete(key)}>
@@ -155,15 +161,50 @@ export const EditableTable = () => {
             </Popconfirm>
           ) : ''}
         </>
-    },
-  ];
-  const handleAdd = () => {
-    const newData: DataType = {
+    }
+    // 获取所有键的集合
+    const dataFields = new Set();
+    dataSource.map((oneCol: {[key: string]: string}) => {
+      Object.keys(oneCol).map((oneKey) => {
+        dataFields.add(oneKey);
+      })
+    })
+    console.log('所有键', dataFields);
+    // 将键设置为表头的格式
+    // 突然意识到，Set原型上没有实现map
+    const formatedDataFields: Array<TableTitle> = [];
+    dataFields.forEach((oneField) => {
+      formatedDataFields.push({
+        editable: true,
+        title: oneField,
+        dataIndex: oneField,
+        handleSave
+      })
+    })
 
-    };
-    setDataSource([...dataSource, newData]);
-    setCount(count + 1);
+    setTableColumns([
+      ...formatedDataFields,
+      operationFields
+    ])
+  }
+
+  // useEffect(() => {
+
+  // }, [dataSource]);
+
+  const handleDelete = (key: React.Key) => {
+    // const newData = dataSource.filter(item => item.key !== key);
+    // setDataSource(newData);
+    console.log(key);
   };
+
+  // const handleAdd = () => {
+  //   const newData: DataType = {
+
+  //   };
+  //   setDataSource([...dataSource, newData]);
+  //   setCount(count + 1);
+  // };
 
   const handleSave = (row: DataType) => {
     const newData = [...dataSource];
@@ -183,29 +224,30 @@ export const EditableTable = () => {
     },
   };
 
-  const columns = defaultColumns.map(col => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: DataType) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
+  // const columns = tableColumns.map((col: any) => {
+  //   if (!col.editable) {
+  //     return col;
+  //   }
+  //   return {
+  //     ...col,
+  //     onCell: (record: DataType) => {
+  //       return {
+  //         record,
+  //         editable: col.editable ?? '',
+  //         dataIndex: col.dataIndex ?? '',
+  //         title: col.title ?? '',
+  //         // handleSave,
+  //       }},
+  //   };
+  // });
 
   return (
     <div className='p-2'>
       <Space>
-        <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
+        <Button type="primary" style={{ marginBottom: 16 }}>
           添加数据
         </Button>
-        <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
+        <Button type="primary" style={{ marginBottom: 16 }}>
           其他操作1
         </Button>
       </Space>
@@ -214,7 +256,7 @@ export const EditableTable = () => {
         rowClassName={() => 'editable-row'}
         bordered
         dataSource={dataSource}
-        columns={columns as ColumnTypes}
+        columns={tableColumns as ColumnTypes}
       />
     </div>
   );

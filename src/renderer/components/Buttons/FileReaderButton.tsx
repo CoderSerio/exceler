@@ -16,5 +16,4 @@ export const FileReaderButton = () => {
       <Button>上传文件</Button>
     </Upload>
   )
-
 }

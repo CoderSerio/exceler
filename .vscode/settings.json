@@ -4,7 +4,7 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-  
+
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -12,9 +12,9 @@
     "typescriptreact"
   ],
 
-  "javascript.validate.enable": false,
-  "javascript.format.enable": false,
-  "typescript.format.enable": false,
+  "javascript.validate.enable": true,
+  "javascript.format.enable": true,
+  "typescript.format.enable": true,
 
   "search.exclude": {
     ".git": true,
