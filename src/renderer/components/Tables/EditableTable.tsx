@@ -55,25 +55,25 @@ const EditableCell: React.FC<EditableCellProps> = ({
   useEffect(() => {
     if (editing) {
       inputRef?.current?.focus();
+      console.log(inputRef);
     }
   }, [editing]);
 
   const toggleEdit = () => {
+
     setEditing(!editing);
-    // form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
   };
 
   const save = async () => {
-
     try {
       const values = await form.validateFields();
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log('Save failed:', errInfo);
+      console.log('数据修改失败，错误原因:', errInfo);
     }
   };
-
   let childNode = children;
   childNode = editing ? (
     <Form.Item
@@ -82,7 +82,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       rules={[
         {
           required: false,
-          message: `${title} is required.`,
+          message: `${title} 是必要的.`,
         },
       ]}
     >
@@ -135,8 +135,8 @@ export const EditableTable = () => {
 
   const generateTableField = () => {
     const operationFields = {
-      title: 'operation',
-      dataIndex: 'operation',
+      title: '操作',
+      dataIndex: '操作',
       render: (_: any, value: any, key: any) =>
         <>
           {dataSource.length >= 1 ? (
@@ -153,7 +153,6 @@ export const EditableTable = () => {
         dataFields.add(oneKey);
       })
     })
-    console.log('所有键', dataFields);
     // 将键设置为表头的格式
     // 突然意识到，Set原型上没有实现map
     const formatedDataFields: Array<TableTitle> = [];
