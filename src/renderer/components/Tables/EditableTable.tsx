@@ -7,7 +7,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
 interface TableItem {
-  [key: string]: string | boolean
+  [key: string]: any
 }
 
 interface TableTitle {
@@ -54,19 +54,19 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   useEffect(() => {
     if (editing) {
-      inputRef.current!.focus();
+      inputRef?.current?.focus();
     }
   }, [editing]);
 
   const toggleEdit = () => {
     setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    // form.setFieldsValue({ [dataIndex]: record[dataIndex] });
   };
 
   const save = async () => {
+
     try {
       const values = await form.validateFields();
-
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
@@ -75,27 +75,32 @@ const EditableCell: React.FC<EditableCellProps> = ({
   };
 
   let childNode = children;
-
-  if (editable) {
-    childNode = editing ? (
-      <Form.Item
-        style={{ margin: 0 }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
-      >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
-    ) : (
-      <div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={toggleEdit}>
-        {children}
-      </div>
-    );
-  }
+  childNode = editing ? (
+    <Form.Item
+      style={{ margin: 0 }}
+      name={dataIndex}
+      rules={[
+        {
+          required: false,
+          message: `${title} is required.`,
+        },
+      ]}
+    >
+      <Input
+        ref={inputRef}
+        onPressEnter={save}
+        onBlur={save}
+        defaultValue={children?.toString()}
+      />
+    </Form.Item>
+  ) : (
+    <div
+      className="editable-cell-value-wrap"
+      style={{ paddingRight: 24 }}
+      onClick={toggleEdit}>
+      {children}
+    </div>
+  );
 
   return <td {...restProps}>{childNode}</td>;
 };
@@ -122,32 +127,11 @@ export const EditableTable = () => {
       key: '1',
       name: 'Edward King 1',
       address: 'London, Park Lane no. 1',
-      test: '123123'
+      "测试字段": "hhh"
     },
   ]);
   // 标题字段
-  const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([
-    {
-      title: 'name',
-      dataIndex: 'name',
-      editable: true,
-    },
-    {
-      title: '3',
-      dataIndex: '3',
-      editable: true,
-    },
-    {
-      title: 'age',
-      dataIndex: 'age',
-      editable: true,
-    },
-    {
-      title: 'address',
-      dataIndex: 'address',
-      editable: true,
-    },
-  ]);
+  const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
 
   const generateTableField = () => {
     const operationFields = {
@@ -174,11 +158,21 @@ export const EditableTable = () => {
     // 突然意识到，Set原型上没有实现map
     const formatedDataFields: Array<TableTitle> = [];
     dataFields.forEach((oneField) => {
+      if (oneField === 'key') {
+        console.log('我是', oneField)
+      }
       formatedDataFields.push({
-        editable: true,
         title: oneField,
         dataIndex: oneField,
-        handleSave
+        onCell: (record: DataType) => {
+          return {
+            record,
+            editable: false,
+            dataIndex: oneField,
+            title: oneField,
+            handleSave,
+          }
+        },
       })
     })
 
@@ -188,23 +182,19 @@ export const EditableTable = () => {
     ])
   }
 
-  // useEffect(() => {
-
-  // }, [dataSource]);
+  useEffect(() => {
+    generateTableField();
+  }, [dataSource]);
 
   const handleDelete = (key: React.Key) => {
-    // const newData = dataSource.filter(item => item.key !== key);
-    // setDataSource(newData);
-    console.log(key);
+    const newData = dataSource.filter(item => item.key !== key);
+    setDataSource(newData);
   };
 
-  // const handleAdd = () => {
-  //   const newData: DataType = {
-
-  //   };
-  //   setDataSource([...dataSource, newData]);
-  //   setCount(count + 1);
-  // };
+  // 批量处理就循环调用
+  const handleAdd = (newData: DataType = {}) => {
+    setDataSource([...dataSource, newData]);
+  };
 
   const handleSave = (row: DataType) => {
     const newData = [...dataSource];
@@ -244,6 +234,9 @@ export const EditableTable = () => {
   return (
     <div className='p-2'>
       <Space>
+        <Button onClick={() => {handleAdd()}} type="primary" style={{ marginBottom: 16 }}>
+          测试操作
+        </Button>
         <Button type="primary" style={{ marginBottom: 16 }}>
           添加数据
         </Button>
@@ -257,6 +250,7 @@ export const EditableTable = () => {
         bordered
         dataSource={dataSource}
         columns={tableColumns as ColumnTypes}
+        scroll={{ x:  300 + tableColumns.length * 80}}
       />
     </div>
   );
