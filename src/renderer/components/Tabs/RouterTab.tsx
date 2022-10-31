@@ -32,7 +32,6 @@ export const RouterTab = ({extraRouters = []}:Props) => {
           })}
         </Routes>
       </div>
-
     </div>
   );
 }
