@@ -32,7 +32,7 @@ const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
 
 interface EditableCellProps {
   title: React.ReactNode;
-  editable: boolean;
+  constant: boolean;
   children: React.ReactNode;
   dataIndex: string;
   record: TableItem;
@@ -41,7 +41,7 @@ interface EditableCellProps {
 
 const EditableCell: React.FC<EditableCellProps> = ({
   title,
-  editable,
+  constant,
   children,
   dataIndex,
   record,
@@ -55,12 +55,10 @@ const EditableCell: React.FC<EditableCellProps> = ({
   useEffect(() => {
     if (editing) {
       inputRef?.current?.focus();
-      console.log(inputRef);
     }
   }, [editing]);
 
   const toggleEdit = () => {
-
     setEditing(!editing);
     form.setFieldsValue({ [dataIndex]: record[dataIndex] });
   };
@@ -69,38 +67,49 @@ const EditableCell: React.FC<EditableCellProps> = ({
     try {
       const values = await form.validateFields();
       toggleEdit();
+      const keys = Object.keys(values);
+      // TODO: 封装一个Toast
+      if (keys.includes('key')) { // 不允许修改主键
+        console.log('修改失败, 不允许修改主键');
+        return;
+      } else if (!values[keys[0]]) { // 因为是cell所以只有一个
+        values[keys[0]] = '（空）'
+      }
       handleSave({ ...record, ...values });
     } catch (errInfo) {
       console.log('数据修改失败，错误原因:', errInfo);
     }
   };
+  // 获取子元素
   let childNode = children;
-  childNode = editing ? (
-    <Form.Item
-      style={{ margin: 0 }}
-      name={dataIndex}
-      rules={[
-        {
-          required: false,
-          message: `${title} 是必要的.`,
-        },
-      ]}
-    >
-      <Input
-        ref={inputRef}
-        onPressEnter={save}
-        onBlur={save}
-        defaultValue={children?.toString()}
-      />
-    </Form.Item>
-  ) : (
-    <div
-      className="editable-cell-value-wrap"
-      style={{ paddingRight: 24 }}
-      onClick={toggleEdit}>
-      {children}
-    </div>
-  );
+  // 如果是可编辑的内容
+  if (!constant) {
+    childNode = editing ? (
+      <Form.Item
+        style={{ margin: 0 }}
+        name={dataIndex}
+        rules={[
+          {
+            required: false,
+            message: `${title} 是必要的.`,
+          },
+        ]}
+      >
+        <Input
+          ref={inputRef}
+          onPressEnter={save}
+          onBlur={save}
+        />
+      </Form.Item>
+    ) : (
+      <div
+        className="editable-cell-value-wrap"
+        style={{ paddingRight: 24 }}
+        onClick={toggleEdit}>
+        {children}
+      </div>
+    );
+  }
 
   return <td {...restProps}>{childNode}</td>;
 };
@@ -108,6 +117,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 type EditableTableProps = Parameters<typeof Table>[0];
 
 interface DataType {
+  key: string,
   [key: string]: string,
 }
 
@@ -115,7 +125,7 @@ type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
 export const EditableTable = () => {
   // 标题
-
+  // TODO: 改为从文件读入Redux然后再获取
   const [dataSource, setDataSource] = useState<DataType[]>([
     {
       key: '0',
@@ -129,23 +139,37 @@ export const EditableTable = () => {
       address: 'London, Park Lane no. 1',
       "测试字段": "hhh"
     },
+    {
+      key: '3',
+      name: 'Edward King 1',
+      address: 'London, Park Lane no. 1',
+      "测试字段": "hhh"
+    },
   ]);
   // 标题字段
   const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
 
   const generateTableField = () => {
-    const operationFields = {
-      title: '操作',
-      dataIndex: '操作',
-      render: (_: any, value: any, key: any) =>
-        <>
-          {dataSource.length >= 1 ? (
-            <Popconfirm title="确定要删除吗" onConfirm={() => handleDelete(key)}>
-              <a>删除</a>
-            </Popconfirm>
-          ) : ''}
-        </>
-    }
+    const operationFields = [
+      {
+        title: '操作',
+        dataIndex: '操作',
+        onCell: () => {
+          return {
+            constant: true
+          }
+        },
+        render: (_: any, record: { key: React.Key }) => {
+          return <>
+            {dataSource.length >= 1 ? (
+              <Popconfirm title="确定要删除吗" onConfirm={() => handleDelete(record.key)}>
+                <a>删除</a>
+              </Popconfirm>
+            ) : ''}
+          </>
+        }
+      }
+    ]
     // 获取所有键的集合
     const dataFields = new Set();
     dataSource.map((oneCol: {[key: string]: string}) => {
@@ -157,16 +181,13 @@ export const EditableTable = () => {
     // 突然意识到，Set原型上没有实现map
     const formatedDataFields: Array<TableTitle> = [];
     dataFields.forEach((oneField) => {
-      if (oneField === 'key') {
-        console.log('我是', oneField)
-      }
       formatedDataFields.push({
         title: oneField,
         dataIndex: oneField,
+
         onCell: (record: DataType) => {
           return {
             record,
-            editable: false,
             dataIndex: oneField,
             title: oneField,
             handleSave,
@@ -177,7 +198,7 @@ export const EditableTable = () => {
 
     setTableColumns([
       ...formatedDataFields,
-      operationFields
+      ...operationFields
     ])
   }
 
@@ -186,12 +207,13 @@ export const EditableTable = () => {
   }, [dataSource]);
 
   const handleDelete = (key: React.Key) => {
-    const newData = dataSource.filter(item => item.key !== key);
-    setDataSource(newData);
+    let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
+    console.log(key, newData);
+    setDataSource(newData as Array<DataType>);
   };
 
   // 批量处理就循环调用
-  const handleAdd = (newData: DataType = {}) => {
+  const handleAdd = (newData: DataType = {key: `${dataSource.length}`}) => {
     setDataSource([...dataSource, newData]);
   };
 
@@ -212,23 +234,6 @@ export const EditableTable = () => {
       cell: EditableCell,
     },
   };
-
-  // const columns = tableColumns.map((col: any) => {
-  //   if (!col.editable) {
-  //     return col;
-  //   }
-  //   return {
-  //     ...col,
-  //     onCell: (record: DataType) => {
-  //       return {
-  //         record,
-  //         editable: col.editable ?? '',
-  //         dataIndex: col.dataIndex ?? '',
-  //         title: col.title ?? '',
-  //         // handleSave,
-  //       }},
-  //   };
-  // });
 
   return (
     <div className='p-2'>
