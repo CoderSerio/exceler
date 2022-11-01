@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { WrappedTransfer } from 'renderer/components/Transfer/WrappedTransfer';
 import { FileReaderButton } from 'renderer/components/Buttons/FileReaderButton';
-import { EditableTable } from 'renderer/components/Tables/EditableTable';
 import { InputButton } from 'renderer/components/Buttons/InputButton';
-import { TableRouterTab } from 'renderer/components/Cards/TableRouterTab';
+import { LayoutedTable } from 'renderer/components/Tables/LayoutedTable';
 
 
 export const Home = () => {
@@ -19,8 +18,7 @@ export const Home = () => {
         </div>
       </div>
       <div className='w-2/3 h-screen'>
-        <TableRouterTab></TableRouterTab>
-        <EditableTable></EditableTable>
+          <LayoutedTable></LayoutedTable>
       </div>
     </div>
   );

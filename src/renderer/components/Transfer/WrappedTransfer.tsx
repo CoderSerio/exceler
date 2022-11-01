@@ -1,43 +1,41 @@
 import { useState, useEffect } from 'react'
 import { Transfer } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
+import { useAppSelector } from 'renderer/hooks/store';
+import { AllFiles } from 'renderer/store/reducers/types';
 
-interface RecordType {
+interface TransferData {
   key: string;
   title: string;
-  description: string;
-  chosen: boolean;
+  disable: boolean;
 }
 
 export const WrappedTransfer = () => {
-  const [mockData, setMockData] = useState<RecordType[]>([]);
-  const [targetKeys, setTargetKeys] = useState<string[]>([]);
+  const allFiles: AllFiles = useAppSelector(state => state.fileData);
+  // 有哪些文件
+  const [transferData, setTransferData] = useState<Array<TransferData>>([]);
+  const [targetKeys, setTargetKeys] = useState<Array<string>>([]);
 
-  const getMock = () => {
-    const tempTargetKeys = [];
-    const tempMockData = [];
-    for (let i = 0; i < 20; i++) {
-      const data = {
-        key: i.toString(),
-        title: `商品${i + 1}`,
-        description: `描述${i + 1}`,
-        chosen: i % 2 === 0,
-      };
-      if (data.chosen) {
-        tempTargetKeys.push(data.key);
-      }
-      tempMockData.push(data);
-    }
-    setMockData(tempMockData);
-    setTargetKeys(tempTargetKeys);
+  const getData = () => {
+    const tempTransferData: Array<TransferData> = [];
+    allFiles.forEach((oneFile) => {
+      oneFile.allColFields.forEach((oneColField) => {
+        tempTransferData.push({
+          key: oneColField.name,
+          title: oneColField.name,
+          disable: oneColField.disable
+        });
+      })
+    })
+    setTransferData(tempTransferData);
   };
 
   useEffect(() => {
-    getMock();
-  }, []);
+    getData();
+  }, [allFiles]);
 
-  const filterOption = (inputValue: string, option: RecordType) =>
-    option.description.indexOf(inputValue) > -1;
+  // const filterOption = (inputValue: string, option: RecordType) =>
+  //   option.description.indexOf(inputValue) > -1;
 
   const handleChange = (newTargetKeys: string[]) => {
     setTargetKeys(newTargetKeys);
@@ -53,9 +51,9 @@ export const WrappedTransfer = () => {
         listStyle={{
           height: '100%',
         }}
-        dataSource={mockData}
+        dataSource={transferData}
         showSearch
-        filterOption={filterOption}
+        // filterOption={filterOption}
         targetKeys={targetKeys}
         onChange={handleChange}
         onSearch={handleSearch}

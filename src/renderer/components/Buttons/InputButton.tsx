@@ -14,7 +14,6 @@ export const InputButton = () => {
         enterButton="添加"
         size="large"
         onSearch={handleInput}
-
       />
     </div>
   )

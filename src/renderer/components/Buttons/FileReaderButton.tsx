@@ -1,7 +1,8 @@
 import { Upload, Button } from "antd"
 import { useAppDispatch, useAppSelector } from "renderer/hooks/store";
 import { AppDispatch } from "renderer/store";
-import { addFile, setFile, deleteFile } from "renderer/store/reducers/fileDataReducer";
+import { addFile, deleteFile } from "renderer/store/reducers/fileDataReducer";
+import { ColField } from "renderer/store/reducers/types";
 import { xlsxFileRead } from "utils/fileHandler"
 
 interface ExcelData {
@@ -14,8 +15,24 @@ export const FileReaderButton = () => {
 
 
   const storeData = async (file: File) => {
-    const xlsxData = await xlsxFileRead(file);
-    dispatch(addFile({id: file.name, data: xlsxData}));
+    const allRows = await xlsxFileRead(file);
+
+    const allColFieldsSet: Set<string> = new Set();
+    allRows.map((oneRow: {[key: string]: string}) => {
+      Object.keys(oneRow).map((oneColField) => {
+        // 不能在这一步直接修改数据结构，因为引用数据类型被Set处理为不同元素
+        // allColFields.add({ name: oneColField, disable: false });
+        // 先用集合处理，会比find操作更快
+        allColFieldsSet.add(oneColField);
+      })
+    })
+    const allColFields: Array<ColField> = [];
+    allColFieldsSet.forEach((oneColField: string) => {
+      allColFields.push({name: oneColField, disable: false});
+    })
+
+    dispatch(addFile({id: file.name, allRows, allColFields}));
+    console.log(allFiles);
   }
 
   const handleBeforeUpload = (file: File) => {
@@ -29,7 +46,7 @@ export const FileReaderButton = () => {
   }
 
   return (
-    <div >
+    <div>
       <Upload
         customRequest={(e) => storeData(e.file as File)}
         beforeUpload={(e) => handleBeforeUpload(e)}

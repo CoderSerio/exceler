@@ -3,21 +3,10 @@ import { InputRef, Space } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { DataType, EditableCellProps, EditableRowProps, TableTitle } from './types';
+
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface TableItem {
-  [key: string]: any
-}
-
-interface TableTitle {
-  [key: string]: any
-}
-
-
-interface EditableRowProps {
-  index: number;
-}
 
 const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -29,15 +18,6 @@ const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
     </Form>
   );
 };
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  constant: boolean;
-  children: React.ReactNode;
-  dataIndex: string;
-  record: TableItem;
-  handleSave: (record: TableItem) => void;
-}
 
 const EditableCell: React.FC<EditableCellProps> = ({
   title,
@@ -115,12 +95,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 type EditableTableProps = Parameters<typeof Table>[0];
 
-interface DataType {
-  key: string,
-  [key: string]: string,
-}
-
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
+
+interface Props {
+  data: Array<DataType>,
+}
 
 export const EditableTable = () => {
   // 标题

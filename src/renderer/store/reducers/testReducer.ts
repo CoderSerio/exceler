@@ -3,11 +3,7 @@ import { RootState } from '../index';
 
 // 模拟异步
 import { asyncTestFunc } from 'utils/test';
-
-
-export interface TestState {
-  value: number;
-}
+import { TestState } from './types';
 
 const initialState: TestState = {
   value: 0,
