@@ -10,7 +10,7 @@ export const Home = () => {
   return (
     <div className='flex place-content-around'>
       <div className='w-1/3 max-w-sm min-w-max h-screen flex flex-col'>
-        <div className='h-1/5 truncate p-2'>
+        <div className='min-h-1/5 max-h-2/5 overflow-y-auto p-2'>
           <FileReaderButton></FileReaderButton>
           <InputButton></InputButton>
         </div>

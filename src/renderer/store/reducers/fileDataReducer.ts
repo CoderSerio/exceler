@@ -19,14 +19,13 @@ export type AllFiles = Array<OneFile>;
 const initialState: AllFiles = [];
 
 export const fileDataSlice = createSlice({
-  name: 'file',
+  name: 'fileData',
   initialState,
   reducers: {
     addFile: (state: AllFiles, action ) => {
       console.log('拿到了数据', action.payload);
-      // state.forEach((file: OneFile) => {
-      //   initialState.push(file);
-      // })
+      state.push(action.payload);
+      console.log('有毒？', state[0])
     },
     setFile: (state: AllFiles) => {
       console.log('修改数据,开发中', state);

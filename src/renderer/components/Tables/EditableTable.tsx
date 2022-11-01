@@ -103,8 +103,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       </Form.Item>
     ) : (
       <div
-        className="editable-cell-value-wrap"
-        style={{ paddingRight: 24 }}
+        className="editable-cell-value-wrap pr-4"
         onClick={toggleEdit}>
         {children}
       </div>
@@ -184,7 +183,6 @@ export const EditableTable = () => {
       formatedDataFields.push({
         title: oneField,
         dataIndex: oneField,
-
         onCell: (record: DataType) => {
           return {
             record,
@@ -228,6 +226,10 @@ export const EditableTable = () => {
     setDataSource(newData);
   };
 
+  const handleRefresh = () => {
+
+  }
+
   const components = {
     body: {
       row: EditableRow,
@@ -238,14 +240,14 @@ export const EditableTable = () => {
   return (
     <div className='p-2'>
       <Space>
-        <Button onClick={() => {handleAdd()}} type="primary" style={{ marginBottom: 16 }}>
-          测试操作
+        <Button onClick={() => {handleAdd()}} type="primary" >
+          添加数据（测试）
         </Button>
-        <Button type="primary" style={{ marginBottom: 16 }}>
-          添加数据
+        <Button onClick={() => {console.log('123')}} type="primary">
+          导出数据（测试）
         </Button>
-        <Button type="primary" style={{ marginBottom: 16 }}>
-          其他操作1
+        <Button type="primary">
+          刷新数据（测试）
         </Button>
       </Space>
       <Table
