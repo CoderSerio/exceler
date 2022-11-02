@@ -148,22 +148,22 @@ export const EditableTable = () => {
     // 突然意识到，Set原型上没有实现map
     const formatedDataFields: Array<TableTitle> = [];
     allFiles[activeFile.index]?.allColFields.forEach((oneField) => {
-      // TODO: 加個IF
-      formatedDataFields.push({
-        title: oneField.name,
-        dataIndex: oneField.name,
-        onCell: (record: DataType) => {
-          return {
-            record,
-            dataIndex: oneField.name,
-            title: oneField.name,
-            handleSave,
-          }
-        },
-      })
+      if (!oneField.disable) {
+        formatedDataFields.push({
+          title: oneField.name,
+          dataIndex: oneField.name,
+          onCell: (record: DataType) => {
+            return {
+              record,
+              dataIndex: oneField.name,
+              title: oneField.name,
+              handleSave,
+            }
+          },
+        })
+      }
     })
 
-    console.log('你麼問題', formatedDataFields)
     setTableColumns([
       ...formatedDataFields,
       ...operationFields
@@ -172,10 +172,11 @@ export const EditableTable = () => {
   const generateTabble = async () => {
     generateTableCols();
     generateTableRows();
+    console.log('hello????')
   }
   useEffect(() => {
     generateTabble();
-  }, [activeFile.index])
+  }, [activeFile.index, activeFile!.lastModify])
 
 
   const handleDelete = (key: React.Key) => {

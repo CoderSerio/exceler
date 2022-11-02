@@ -12,7 +12,7 @@ export interface RowData {
 export interface ColField {
   name: string,
   disable: boolean,
-  // 树形结构存储，所以不需要存储其属于哪个文件
+  from: string,
 }
 
 // 一个文件
@@ -24,9 +24,9 @@ export interface OneFile {
 
 // 所有文件的集合
 export type AllFiles = Array<OneFile>;
-
 // 当前显示的是哪个文件的
 export interface ActiveFileState {
   id: string,
   index: number,
+  lastModify?: string
 }

@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
 import { AllFiles, ColField } from 'renderer/store/reducers/types';
 import { AppDispatch } from 'renderer/store';
 import { updateColField } from 'renderer/store/reducers/fileDataReducer';
-import { updateActiveFileIndex } from 'renderer/store/reducers/activeFileReducer';
+import { modifyActiveFile, updateActiveFileIndex } from 'renderer/store/reducers/activeFileReducer';
 
 interface TransferData {
   key: string;
@@ -65,22 +65,21 @@ export const WrappedTransfer = () => {
     getData();
   }, [allFiles, activeFileName]);
 
-  // const filterOption = (inputValue: string, option: RecordType) =>
-  // option.description.indexOf(inputValue) > -1;
   // 参数是已经选中的（右侧的）内容
   const handleChange = (checkedFields: Array<string>) => {
     const tempAllColFields: Array<ColField> = []
     allFiles.map((oneFile) => {
       oneFile.allColFields.forEach((oneColField) => {
         if (checkedFields.includes(oneColField.name)) {
-          tempAllColFields.push({ name: oneColField.name, disable: false });
+          tempAllColFields.push({ name: oneColField.name, disable: false, from: oneFile.id });
         } else {
-          tempAllColFields.push({ name: oneColField.name, disable: true });
+          tempAllColFields.push({ name: oneColField.name, disable: true, from: oneFile.id });
         }
       })
     })
     // 由于是change时触发，所以保证一定不为空
     dispatch(updateColField(tempAllColFields))
+    dispatch(modifyActiveFile(`${new Date()}`));
     setTargetKeys(checkedFields);
   };
 

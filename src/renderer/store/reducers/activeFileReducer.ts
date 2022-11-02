@@ -4,7 +4,8 @@ import { ActiveFileState } from './types';
 
 const initialState: ActiveFileState = {
   id: '',
-  index: -1
+  index: 0,
+  lastModify: 'abdccscac',
 };
 
 export const activeFileSlice = createSlice({
@@ -15,9 +16,12 @@ export const activeFileSlice = createSlice({
       state.id = action.payload.id;
       state.index = action.payload.index;
     },
+    modifyActiveFile: (state: ActiveFileState, action: { payload: string }) => {
+      state.lastModify = action.payload;
+    }
   },
 });
 
-export const { updateActiveFileIndex } = activeFileSlice.actions;
+export const { updateActiveFileIndex, modifyActiveFile } = activeFileSlice.actions;
 export const select = (state: RootState) => state.activeFile;
 export default activeFileSlice.reducer;

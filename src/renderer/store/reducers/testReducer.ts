@@ -34,7 +34,6 @@ export const testSlice = createSlice({
   }
 });
 
-
 export const { increment, decrement } = testSlice.actions;
 // 用来get数据的（响应式）
 export const selectTest = (state: RootState) => state.test.value;
