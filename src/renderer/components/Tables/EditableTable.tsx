@@ -134,7 +134,7 @@ export const EditableTable = () => {
         },
         render: (_: any, record: { key: React.Key }) => {
           return <>
-            {dataSource.length >= 1 ? (
+            {dataSource.length && tableColumns.length ? (
               <Popconfirm title="确定要删除吗" onConfirm={() => handleDelete(record.key)}>
                 <a>删除</a>
               </Popconfirm>
@@ -169,20 +169,20 @@ export const EditableTable = () => {
       ...operationFields
     ])
   }
-  const generateTabble = async () => {
-    generateTableCols();
-    generateTableRows();
-    console.log('hello????')
-  }
+  // const generateTabble = async () => {
+  //   generateTableCols();
+  // }
   useEffect(() => {
-    generateTabble();
+    generateTableCols();
+  }, [activeFile.index, activeFile!.lastModify, dataSource])
+  useEffect(() => {
+    generateTableRows();
   }, [activeFile.index, activeFile!.lastModify])
-
 
   const handleDelete = (key: React.Key) => {
     let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
     console.log(key, newData);
-    setDataSource(newData as Array<DataType>);
+    setDataSource(newData);
   };
 
   // 批量处理就循环调用
