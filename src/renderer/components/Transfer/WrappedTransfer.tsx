@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Transfer } from 'antd';
+import { Button, Transfer } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
-import { useAppSelector } from 'renderer/hooks/store';
-import { AllFiles } from 'renderer/store/reducers/types';
+import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
+import { AllFiles, ColField } from 'renderer/store/reducers/types';
+import { AppDispatch } from 'renderer/store';
+import { updateColField } from 'renderer/store/reducers/fileDataReducer';
+import { updateActiveFileIndex } from 'renderer/store/reducers/activeFileReducer';
 
 interface TransferData {
   key: string;
@@ -12,33 +15,73 @@ interface TransferData {
 
 export const WrappedTransfer = () => {
   const allFiles: AllFiles = useAppSelector(state => state.fileData);
+  const dispatch: AppDispatch = useAppDispatch();
   // 有哪些文件
+  const [fileNames, setFileNames] = useState<Array<string>>([]);
+  const [activeFileName, setActiveFileName] = useState<string>();
   const [transferData, setTransferData] = useState<Array<TransferData>>([]);
   const [targetKeys, setTargetKeys] = useState<Array<string>>([]);
 
+  const handleSetActiveFileName = (name: string) => {
+    setActiveFileName(name);
+    // TODO: 可优化点，希望能提前break掉
+    allFiles.forEach((oneFile, index) => {
+      if (oneFile.id === name) {
+        dispatch(updateActiveFileIndex({ id: name, index: index }));
+        return;
+      }
+    })
+  }
+
   const getData = () => {
     const tempTransferData: Array<TransferData> = [];
+    const tempFileNames: Array<string> = [];
+    let changed = false;
     allFiles.forEach((oneFile) => {
-      oneFile.allColFields.forEach((oneColField) => {
-        tempTransferData.push({
-          key: oneColField.name,
-          title: oneColField.name,
-          disable: oneColField.disable
-        });
-      })
+      // 文件列表为空 或者 文件列表发生改动后
+      tempFileNames.push(oneFile.id);
+      if (fileNames.length === 0
+        || (!changed && oneFile.id === activeFileName)) {
+        changed = true;
+        oneFile.allColFields.forEach((oneColField, index) => {
+          tempTransferData.push({
+            key: oneColField.name,
+            title: oneColField.name,
+            disable: oneColField.disable
+          });
+        })
+      }
     })
-    setTransferData(tempTransferData);
+    if (allFiles.length === 1) {
+      handleSetActiveFileName(tempFileNames[0]);
+    }
+    if (changed) {
+      setFileNames(tempFileNames);
+      setTransferData(tempTransferData);
+    }
   };
 
   useEffect(() => {
     getData();
-  }, [allFiles]);
+  }, [allFiles, activeFileName]);
 
   // const filterOption = (inputValue: string, option: RecordType) =>
-  //   option.description.indexOf(inputValue) > -1;
-
-  const handleChange = (newTargetKeys: string[]) => {
-    setTargetKeys(newTargetKeys);
+  // option.description.indexOf(inputValue) > -1;
+  // 参数是已经选中的（右侧的）内容
+  const handleChange = (checkedFields: Array<string>) => {
+    const tempAllColFields: Array<ColField> = []
+    allFiles.map((oneFile) => {
+      oneFile.allColFields.forEach((oneColField) => {
+        if (checkedFields.includes(oneColField.name)) {
+          tempAllColFields.push({ name: oneColField.name, disable: false });
+        } else {
+          tempAllColFields.push({ name: oneColField.name, disable: true });
+        }
+      })
+    })
+    // 由于是change时触发，所以保证一定不为空
+    dispatch(updateColField(tempAllColFields))
+    setTargetKeys(checkedFields);
   };
 
   const handleSearch = (dir: TransferDirection, value: string) => {
@@ -47,6 +90,16 @@ export const WrappedTransfer = () => {
 
 
   return (
+    <>
+      <div>
+          {fileNames.map((oneFileName) => {
+            return (
+              <div key={oneFileName}>
+                <Button onClick={() => {handleSetActiveFileName(oneFileName)}}>{oneFileName}</Button>
+              </div>
+            )
+          })}
+      </div>
       <Transfer
         listStyle={{
           height: '100%',
@@ -59,5 +112,6 @@ export const WrappedTransfer = () => {
         onSearch={handleSearch}
         render={item => item.title}
       />
+    </>
   );
 }

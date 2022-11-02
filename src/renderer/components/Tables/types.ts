@@ -20,6 +20,8 @@ export interface EditableCellProps {
   handleSave: (record: TableItem) => void;
 }
 
+// 其实就是RowData，但是要考虑antd需要一个key作为每行数据的唯一标识
+// TODO: 这里需要封装一个xlsx数据格式和table数据格式想转换的方法（其实就是处理key）
 export interface DataType {
   key: string,
   [key: string]: string,

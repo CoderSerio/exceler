@@ -4,7 +4,7 @@ import { TableRouterTab } from "./TableRouterTab"
 export const LayoutedTable = () => {
   return (
     <div>
-      <TableRouterTab></TableRouterTab>
+      {/* <TableRouterTab></TableRouterTab> */}
       <EditableTable></EditableTable>
     </div>
   )

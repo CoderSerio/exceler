@@ -3,6 +3,9 @@ import { InputRef, Space } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useAppSelector } from 'renderer/hooks/store';
+import { RootState } from 'renderer/store';
 import { DataType, EditableCellProps, EditableRowProps, TableTitle } from './types';
 
 
@@ -97,44 +100,36 @@ type EditableTableProps = Parameters<typeof Table>[0];
 
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
-interface Props {
-  data: Array<DataType>,
-}
-
 export const EditableTable = () => {
-  // 标题
-  // TODO: 改为从文件读入Redux然后再获取
-  const [dataSource, setDataSource] = useState<DataType[]>([
-    {
-      key: '0',
-      name: 'Edward King 0',
-      age: '32',
-      address: 'London, Park Lane no. 0',
-    },
-    {
-      key: '1',
-      name: 'Edward King 1',
-      address: 'London, Park Lane no. 1',
-      "测试字段": "hhh"
-    },
-    {
-      key: '3',
-      name: 'Edward King 1',
-      address: 'London, Park Lane no. 1',
-      "测试字段": "hhh"
-    },
-  ]);
-  // 标题字段
+  const allFiles = useSelector((state: RootState) => state.fileData);
+  const activeFile = useSelector((state: RootState) => state.activeFile);
+  const [dataSource, setDataSource] = useState<Array<DataType>>([]);
   const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
+  // 获取当前active的文件内容
+  const generateTableRows = () => {
+    if(activeFile.index < 0) {
+      return ;
+    }
+    const newDataSource: Array<DataType> = [];
+    allFiles[activeFile.index]?.allRows.forEach((oneRow, index) => {
+      newDataSource.push({
+        key: `${index}`,
+        ...oneRow,
+      })
+    })
+    console.log('newDataSourc',newDataSource);
+    setDataSource(newDataSource);
+  }
 
-  const generateTableField = () => {
+  // 生成表格表头字段
+  const generateTableCols = () => {
     const operationFields = [
       {
         title: '操作',
         dataIndex: '操作',
-        onCell: () => {
+        onCell: (e: any) => {
           return {
-            constant: true
+            constant: false
           }
         },
         render: (_: any, record: { key: React.Key }) => {
@@ -148,40 +143,40 @@ export const EditableTable = () => {
         }
       }
     ]
-    // 获取所有键的集合
-    const dataFields = new Set();
-    dataSource.map((oneCol: {[key: string]: string}) => {
-      Object.keys(oneCol).map((oneKey) => {
-        dataFields.add(oneKey);
-      })
-    })
+
     // 将键设置为表头的格式
     // 突然意识到，Set原型上没有实现map
     const formatedDataFields: Array<TableTitle> = [];
-    dataFields.forEach((oneField) => {
+    allFiles[activeFile.index]?.allColFields.forEach((oneField) => {
+      // TODO: 加個IF
       formatedDataFields.push({
-        title: oneField,
-        dataIndex: oneField,
+        title: oneField.name,
+        dataIndex: oneField.name,
         onCell: (record: DataType) => {
           return {
             record,
-            dataIndex: oneField,
-            title: oneField,
+            dataIndex: oneField.name,
+            title: oneField.name,
             handleSave,
           }
         },
       })
     })
 
+    console.log('你麼問題', formatedDataFields)
     setTableColumns([
       ...formatedDataFields,
       ...operationFields
     ])
   }
-
+  const generateTabble = async () => {
+    generateTableCols();
+    generateTableRows();
+  }
   useEffect(() => {
-    generateTableField();
-  }, [dataSource]);
+    generateTabble();
+  }, [activeFile.index])
+
 
   const handleDelete = (key: React.Key) => {
     let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
@@ -222,7 +217,7 @@ export const EditableTable = () => {
         <Button onClick={() => {handleAdd()}} type="primary" >
           添加数据（测试）
         </Button>
-        <Button onClick={() => {console.log('123')}} type="primary">
+        <Button onClick={() => {console.log(dataSource)}} type="primary">
           导出数据（测试）
         </Button>
         <Button type="primary">

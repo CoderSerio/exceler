@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { AllFiles, OneFile } from './types';
+import { AllFiles, OneFile, ColField } from './types';
 
 // 由于可以上传多个文件，所以这里要用数组，即文件集合
 const initialState: AllFiles = [];
@@ -12,24 +12,33 @@ export const fileDataSlice = createSlice({
     addFile: (state: AllFiles, action: { payload: OneFile } ) => {
       console.log('收到了数据', action.payload)
       state.push(action.payload);
+      console.log(state[0].allColFields);
     },
     deleteFile: (state: AllFiles) => {
       // 在全局数据中移除这个东西
       console.log('删除数据,开发中', state);
     },
-    updateColField: () => {
-      // TODO: params: 1.来自哪个文件 2.新的内容
+    updateColField: (state: AllFiles, action: { payload: Array<ColField> }) => {
+      // 这一组改动一定来自于同一个文件，并且保证有至少一个元素
+      const fileName = action?.payload[0]?.name;
+      state.forEach((oneFile: OneFile, index) => {
+        if (oneFile.id === fileName) {
+          // 考虑新增字段、修改字段等情况，
+          // 并且表头字段较少所以采用直接新开辟内存的方式
+          state[index].allColFields = action.payload;
+        }
+      })
     },
-    updateRowData: () => {
-      // TODO: params: 1.来自哪个文件 2.该行数据的唯一标示 3.新的内容
+    updateRowData: (state: AllFiles, action) => {
+
 
     }
   },
 })
 
-export const { addFile, deleteFile } = fileDataSlice.actions;
+export const { addFile, deleteFile, updateColField, updateRowData } = fileDataSlice.actions;
 export const selectFileState = ( state: RootState ) => state.fileData;
-export default fileDataSlice.reducer;
+export default fileDataSlice.reducer;``
 // 先做成同步，如果有必要再考虑异步
 // export const asyncAddFile = createAsyncThunk<Array<FileData>>(
 //   'asyncAddFile',

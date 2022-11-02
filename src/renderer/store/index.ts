@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import testReducer from "./reducers/testReducer";
 import fileDataReducer from "./reducers/fileDataReducer";
+import activeFileReducer from "./reducers/activeFileReducer";
 
 const store = configureStore({
   reducer: {
     test: testReducer,
-    fileData: fileDataReducer
+    fileData: fileDataReducer,
+    activeFile: activeFileReducer,
   }
 })
 

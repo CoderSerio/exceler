@@ -16,7 +16,6 @@ export const FileReaderButton = () => {
 
   const storeData = async (file: File) => {
     const allRows = await xlsxFileRead(file);
-
     const allColFieldsSet: Set<string> = new Set();
     allRows.map((oneRow: {[key: string]: string}) => {
       Object.keys(oneRow).map((oneColField) => {
@@ -28,7 +27,8 @@ export const FileReaderButton = () => {
     })
     const allColFields: Array<ColField> = [];
     allColFieldsSet.forEach((oneColField: string) => {
-      allColFields.push({name: oneColField, disable: false});
+      // 初始化都放到左边不启用
+      allColFields.push({name: oneColField, disable: true});
     })
 
     dispatch(addFile({id: file.name, allRows, allColFields}));
