@@ -35,3 +35,11 @@ export interface Tab {
   tab: string,
   // content: string | JSX.Element | React.ReactNode
 }
+
+export interface WbSheetCell {
+  t: string,
+  v: string,
+}
+export interface WbSheet {
+  [key: string]: WbSheetCell,
+}
