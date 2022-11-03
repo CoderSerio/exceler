@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { AllFiles, OneFile, ColField } from './types';
+import { AllFiles, OneFile, ColField, RowData } from './types';
 
 // 由于可以上传多个文件，所以这里要用数组，即文件集合
 const initialState: AllFiles = [];
@@ -14,7 +14,7 @@ export const fileDataSlice = createSlice({
       state.push(action.payload);
     },
     deleteFile: (state: AllFiles) => {
-      // 在全局数据中移除这个东西
+      // 将文件从全局状态管理树上移除
       console.log('删除数据,开发中', state);
     },
     updateColField: (state: AllFiles, action: { payload: Array<ColField> }) => {
@@ -28,9 +28,9 @@ export const fileDataSlice = createSlice({
         }
       })
     },
-    updateRowData: (state: AllFiles, action) => {
-
-
+    updateRowData: (state: AllFiles, action: { payload: {index: number , data: Array<RowData>}}) => {
+      const { payload: { index, data } } = action;
+      state[index].allRows = data;
     },
     modifyFileData: (state: AllFiles, action: { payload: string }) => {
     }
@@ -40,10 +40,3 @@ export const fileDataSlice = createSlice({
 export const { addFile, deleteFile, updateColField, updateRowData } = fileDataSlice.actions;
 export const selectFileState = ( state: RootState ) => state.fileData;
 export default fileDataSlice.reducer;``
-// 先做成同步，如果有必要再考虑异步
-// export const asyncAddFile = createAsyncThunk<Array<FileData>>(
-//   'asyncAddFile',
-//   () => {
-
-//   }
-// )

@@ -1,13 +1,15 @@
-import { InputRef, Pagination, Space } from 'antd';
+import { InputRef, Space } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'renderer/store';
+import { AppDispatch, RootState } from 'renderer/store';
 import { DataType, EditableCellProps, EditableRowProps, TableTitle, WbSheet } from './types';
 import { number2char } from 'utils/excel';
 import { json2xlsx } from 'utils/fileHandler';
 import { RowData } from 'renderer/store/reducers/types';
+import { updateRowData } from 'renderer/store/reducers/fileDataReducer';
+import { useAppDispatch } from 'renderer/hooks/store';
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -42,8 +44,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
   }, [editing]);
 
   const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    if (dataIndex) {
+      setEditing(!editing);
+      form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+      console.log('ref',  inputRef.current);
+    }
   };
 
   const save = async () => {
@@ -80,8 +85,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
       >
         <Input
           ref={inputRef}
-          onPressEnter={save}
-          onBlur={save}
+          onPressEnter={() => {save()}}
+          onBlur={() => {save()}}
         />
       </Form.Item>
     ) : (
@@ -103,6 +108,7 @@ type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 export const EditableTable = () => {
   const allFiles = useSelector((state: RootState) => state.fileData);
   const activeFile = useSelector((state: RootState) => state.activeFile);
+  const dispatch: AppDispatch = useAppDispatch();
   const [dataSource, setDataSource] = useState<Array<DataType>>([]);
   const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
   const tableRef = useRef<any>();
@@ -127,8 +133,8 @@ export const EditableTable = () => {
     const operationFields = [
       {
         title: '操作',
-        dataIndex: '操作',
-        onCell: (e: any) => {
+        dataIndex: '操作1',
+        onCell: () => {
           return {
             constant: false
           }
@@ -184,8 +190,10 @@ export const EditableTable = () => {
 
   const handleDelete = (key: React.Key) => {
     let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
-    console.log(key, newData);
+    console.log('newData', newData);
+    console.log('allFile', allFiles)
     setDataSource(newData);
+    dispatch(updateRowData({ index: activeFile.index, data: newData }));
   };
 
   // 批量处理就循环调用
@@ -201,6 +209,7 @@ export const EditableTable = () => {
       ...item,
       ...row,
     });
+    dispatch(updateRowData({ index: activeFile.index, data: newData }));
     setDataSource(newData);
   };
 
@@ -219,7 +228,7 @@ export const EditableTable = () => {
       }
     })
     console.log('rows', rows)
-    json2xlsx(rows);
+      json2xlsx(rows);
   }
 
   const components = {
