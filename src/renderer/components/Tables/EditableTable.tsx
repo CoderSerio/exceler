@@ -1,13 +1,13 @@
 import { InputRef, Pagination, Space } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
-import React, { Ref, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'renderer/store';
-import { utils, writeFileXLSX } from 'xlsx';
 import { DataType, EditableCellProps, EditableRowProps, TableTitle, WbSheet } from './types';
 import { number2char } from 'utils/excel';
-import { SYSTEM_INSIDE_TABLE_COLS } from 'renderer/configs/tableColsConfigs';
+import { json2xlsx } from 'utils/fileHandler';
+import { RowData } from 'renderer/store/reducers/types';
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -118,7 +118,7 @@ export const EditableTable = () => {
         ...oneRow,
       })
     })
-    console.log('newDataSourc',newDataSource);
+    console.log('newDataSource',newDataSource);
     setDataSource(newDataSource);
   }
 
@@ -205,34 +205,21 @@ export const EditableTable = () => {
   };
 
   const handleExport = () => {
-    const tableDOM = tableRef.current.querySelector('.ant-table-content')
-    const wb = utils.table_to_book(tableDOM);
-    console.log(wb);
-    // TODO: 后面封装成函数, 参数数据源
-    const wbSheet:WbSheet = {};
-    allFiles[activeFile.index].allColFields.forEach((oneCol, colIndex) => {
-      allFiles[activeFile.index].allRows.forEach((oneRow, rowIndex) => {
+    // // 筛选出启用的字段
+    const rows: Array<RowData> = [];
+    allFiles[activeFile.index].allRows.forEach((oneRow) => {
+      const nonDisablePart: RowData = {};
+      allFiles[activeFile.index]?.allColFields.forEach((oneCol) => {
         if (!oneCol.disable) {
-          const key:string = number2char(colIndex + 1) + rowIndex;
-          const value = { t: 's', v: oneRow[oneCol.name]}
-          wbSheet[key] = value;
+          nonDisablePart[oneCol.name] = oneRow[oneCol.name];
         }
       })
-    })
-    const sheetName = wb.SheetNames[0];
-    wb.Sheets[sheetName] = {
-      ...wb.Sheets[sheetName],
-      ...wbSheet
-    }
-    Object.keys(wb.Sheets[sheetName]).forEach((key) => {
-      const v: string = wb.Sheets[sheetName][key].v;
-      if (SYSTEM_INSIDE_TABLE_COLS.includes(v)) {
-        delete wb.Sheets[sheetName][key];
+      if (nonDisablePart) {
+        rows.push(nonDisablePart);
       }
     })
-    // TODO: 上面这个部分封装成函数
-    console.log('final', wb);
-    writeFileXLSX(wb, "最终结果.xlsx");
+    console.log('rows', rows)
+    json2xlsx(rows);
   }
 
   const components = {

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "renderer/hooks/store";
 import { AppDispatch } from "renderer/store";
 import { addFile, deleteFile } from "renderer/store/reducers/fileDataReducer";
 import { ColField } from "renderer/store/reducers/types";
-import { xlsxFileRead } from "utils/fileHandler"
+import { xlsx2json } from "utils/fileHandler"
 
 interface ExcelData {
   [key: string]: any
@@ -15,7 +15,8 @@ export const FileReaderButton = () => {
 
 
   const storeData = async (file: File) => {
-    const allRows = await xlsxFileRead(file);
+    const allRows = await xlsx2json(file);
+    console.log('读入的数据', allRows);
     const allColFieldsSet: Set<string> = new Set();
     allRows.map((oneRow: {[key: string]: string}) => {
       Object.keys(oneRow).map((oneColField) => {
