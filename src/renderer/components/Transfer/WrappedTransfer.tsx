@@ -69,14 +69,12 @@ export const WrappedTransfer = () => {
   // 参数是已经选中的（右侧的）内容
   const handleChange = (checkedFields: Array<string>) => {
     const tempAllColFields: Array<ColField> = [];
-    allFiles.map((oneFile) => {
-      oneFile.allColFields.forEach((oneColField) => {
-        if (checkedFields.includes(oneColField.name)) {
-          tempAllColFields.push({ name: oneColField.name, disable: false, from: oneFile.id });
-        } else {
-          tempAllColFields.push({ name: oneColField.name, disable: true, from: oneFile.id });
-        }
-      })
+    allFiles[activeFile.index].allColFields.forEach((oneColField) => {
+      if (checkedFields.includes(oneColField.name)) {
+        tempAllColFields.push({ name: oneColField.name, disable: false, from: activeFile.id });
+      } else {
+        tempAllColFields.push({ name: oneColField.name, disable: true, from: activeFile.id });
+      }
     })
     // 由于是change时触发，所以保证一定不为空
     dispatch(updateColField({ index: activeFile.index, data: tempAllColFields }));
