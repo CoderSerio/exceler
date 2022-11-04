@@ -16,7 +16,6 @@ export const FileReaderButton = () => {
 
   const storeData = async (file: File) => {
     const allRows = await xlsx2json(file);
-    console.log('读入的数据', allRows);
     const allColFieldsSet: Set<string> = new Set();
     allRows.map((oneRow: {[key: string]: string}) => {
       Object.keys(oneRow).map((oneColField) => {
@@ -33,7 +32,6 @@ export const FileReaderButton = () => {
     })
 
     dispatch(addFile({id: file.name, allRows, allColFields}));
-    console.log(allFiles);
   }
 
   const handleBeforeUpload = (file: File) => {

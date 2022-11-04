@@ -149,11 +149,8 @@ export const EditableTable = () => {
           </>
         }
       }
-    ]
+    ];
 
-    // 将键设置为表头的格式
-    // 突然意识到，Set原型上没有实现map
-    // (猜测因为集合是无序的, 所以也没有可以用来迭代的键)
     const formatedDataFields: Array<TableTitle> = [];
     allFiles[activeFile.index]?.allColFields.forEach((oneField) => {
       if (!oneField.disable) {
