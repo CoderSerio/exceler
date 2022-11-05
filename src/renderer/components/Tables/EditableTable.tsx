@@ -238,24 +238,26 @@ export const EditableTable = () => {
   return (
     <div className='p-2'>
       <Space>
-        <Button onClick={() => {handleAdd()}} type="primary" >
+        <Button onClick={() => {handleAdd()}} type="primary" style={{ height: '40px' }}>
           添加数据（测试）
         </Button>
-        <Button onClick={() => {handleExport()}} type="primary">
+        <Button onClick={() => {handleExport()}} type="primary" style={{ height: '40px' }}>
           导出数据（测试）
         </Button>
-        <Button type="primary" onClick={() => {console.log(number2char(53))}}>
+        <Button type="primary" onClick={() => {console.log(number2char(53))}} style={{ height: '40px' }}>
           导出数据（测试）
         </Button>
       </Space>
       <Table
         ref={tableRef}
+        id='table'
         components={components}
         rowClassName={() => 'editable-row'}
         bordered
         dataSource={dataSource}
         columns={tableColumns as ColumnTypes}
-        scroll={{ x:  300 + tableColumns.length * 80}}
+        scroll={{ x:  300 }}
+        className={'mt-2 '}
       >
       </Table>
     </div>

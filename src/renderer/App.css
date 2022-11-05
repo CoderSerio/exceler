@@ -45,5 +45,50 @@ a:hover {
   text-decoration: none;
 }
 
+#xlsx-file-upload>span {
+  display: flex;
+  width: 100%;
+}
 
+.ant-upload-text-icon {
+  display: none;
+}
 
+.ant-upload-list {
+  width: 80%;
+  /* text-decoration: none; */
+  display: none;
+}
+
+#file-name-btns {
+  height: 100%;
+  width: calc(100vw - 280px);
+  overflow-y: scroll;
+  margin: 0 0 0 10px;
+  text-align: center;
+  padding: 10px 0px;
+}
+
+#content-body {
+  height: calc(100vh - 210px);
+  display: flex;
+}
+#content-body>div:nth-child(1) {
+  width: 400px;
+}
+#content-body>div:nth-child(2) {
+  width: calc(100vw - 440px);
+}
+
+#table {
+  height: calc(100vh - 320px);
+  overflow-y: scroll;
+}
+
+#table .ant-table-content {
+  height: calc(100vh - 320px);
+}
+
+.ant-transfer-list-content {
+  height: calc(100vh - 320px - 208px);
+}

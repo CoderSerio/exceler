@@ -6,12 +6,13 @@ import { AllFiles, ColField } from 'renderer/store/reducers/types';
 import { AppDispatch } from 'renderer/store';
 import { updateColField } from 'renderer/store/reducers/fileDataReducer';
 import { modifyActiveFile, updateActiveFileIndex } from 'renderer/store/reducers/activeFileReducer';
+import { FieldAddButton } from 'renderer/components/Buttons/FieldAddButton';
 
 interface TransferData {
-  key: string;
-  title: string;
-  disable: boolean;
-  from: string;
+  key: string,
+  title: string,
+  disable: boolean,
+  from: string,
 }
 
 export const WrappedTransfer = () => {
@@ -88,15 +89,6 @@ export const WrappedTransfer = () => {
 
   return (
     <>
-      <div>
-          {fileNames.map((oneFileName) => {
-            return (
-              <div key={oneFileName}>
-                <Button onClick={() => {handleSetActiveFileName(oneFileName)}}>{oneFileName}</Button>
-              </div>
-            )
-          })}
-      </div>
       <Transfer
         listStyle={{
           height: '100%',

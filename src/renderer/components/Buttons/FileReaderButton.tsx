@@ -45,25 +45,18 @@ export const FileReaderButton = () => {
   }
 
   return (
-    <div>
+    <div id="xlsx-file-upload" className="px-2">
       <Upload
         customRequest={(e) => storeData(e.file as File)}
         beforeUpload={(e) => handleBeforeUpload(e)}
         accept={'.xlsx'}
-        action=''
+        style={{
+          display: "flex",
+          justifyContent: 'space-around',
+        }}
         multiple>
-        <Button>上传文件</Button>
+        <Button type="primary" style={{width: '280px', height: '160px', fontSize: '32px', margin: '0 0 0 8px'}}>上传文件</Button>
       </Upload>
-      {/* TODO: 临时样式，后面用组件替换 */}
-      <ol>
-        {allFiles.map((oneFile) => {
-          return (
-            <li key={oneFile.id}>
-              {oneFile.id}
-            </li>
-          )
-        })}
-      </ol>
     </div>
   )
 }
