@@ -5,7 +5,7 @@ import { ActiveFileState } from './types';
 const initialState: ActiveFileState = {
   id: '',
   index: 0,
-  lastModify: 'abdccscac',
+  lastModify: 'never',
 };
 
 export const activeFileSlice = createSlice({
