@@ -22,7 +22,7 @@ export const Home = () => {
           <FileNamesButton></FileNamesButton>
         </div>
         <div className='px-2' id='content-body'>
-          <div className='p-2'>
+          <div className='p-2 relative'>
             {/* <InputButton></InputButton> */}
             <FieldAddButton></FieldAddButton>
             <TemplateTable></TemplateTable>

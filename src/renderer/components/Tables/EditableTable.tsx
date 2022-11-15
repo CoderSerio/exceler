@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'renderer/store';
 import { DataType, EditableCellProps, EditableRowProps, TableTitle, WbSheet } from './types';
-import { number2char } from 'utils/excel';
 import { json2xlsx } from 'utils/fileHandler';
 import { RowData } from 'renderer/store/reducers/types';
 import { updateRowData } from 'renderer/store/reducers/fileDataReducer';
@@ -47,7 +46,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     if (dataIndex) {
       setEditing(!editing);
       form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-      console.log('ref',  inputRef.current);
+      // console.log('ref',  inputRef.current);
     }
   };
 
@@ -60,8 +59,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
       if (keys.includes('key')) { // 不允许修改主键
         console.log('修改失败, 不允许修改主键');
         return;
-      } else if (!values[keys[0]]) { // 因为是cell所以只有一个
-        values[keys[0]] = '（空）'
       }
       handleSave({ ...record, ...values });
     } catch (errInfo) {
@@ -124,7 +121,6 @@ export const EditableTable = () => {
         ...oneRow,
       })
     })
-    console.log('newDataSource',newDataSource);
     setDataSource(newDataSource);
   }
 
@@ -133,7 +129,7 @@ export const EditableTable = () => {
     const operationFields = [
       {
         title: '操作',
-        dataIndex: '操作1',
+        dataIndex: '操作',
         onCell: () => {
           return {
             constant: false
@@ -187,8 +183,6 @@ export const EditableTable = () => {
 
   const handleDelete = (key: React.Key) => {
     let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
-    console.log('newData', newData);
-    console.log('allFile', allFiles)
     setDataSource(newData);
     dispatch(updateRowData({ index: activeFile.index, data: newData }));
   };
@@ -224,8 +218,7 @@ export const EditableTable = () => {
         rows.push(nonDisablePart);
       }
     })
-    console.log('rows', rows)
-      json2xlsx(rows);
+    json2xlsx(rows);
   }
 
   const components = {
@@ -239,13 +232,10 @@ export const EditableTable = () => {
     <div className='p-2'>
       <Space>
         <Button onClick={() => {handleAdd()}} type="primary" style={{ height: '40px' }}>
-          添加数据（测试）
+          添加数据
         </Button>
         <Button onClick={() => {handleExport()}} type="primary" style={{ height: '40px' }}>
-          导出数据（测试）
-        </Button>
-        <Button type="primary" onClick={() => {console.log(number2char(53))}} style={{ height: '40px' }}>
-          导出数据（测试）
+          导出数据
         </Button>
       </Space>
       <Table
@@ -256,8 +246,10 @@ export const EditableTable = () => {
         bordered
         dataSource={dataSource}
         columns={tableColumns as ColumnTypes}
-        scroll={{ x:  300 }}
+        scroll={{ x:  300 +  80 * tableColumns.length, y: 560 }}
         className={'mt-2 '}
+        tableLayout={'fixed'}
+        pagination={false}
       >
       </Table>
     </div>

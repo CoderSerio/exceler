@@ -62,15 +62,14 @@ a:hover {
 
 #file-name-btns {
   height: 100%;
-  width: calc(100vw - 280px);
+  width: calc(98vw - 320px);
   overflow-y: scroll;
   margin: 0 0 0 10px;
   text-align: center;
-  padding: 10px 0px;
 }
 
 #content-body {
-  height: calc(100vh - 210px);
+  height: calc(100vh - 250px);
   display: flex;
 }
 #content-body>div:nth-child(1) {
@@ -81,12 +80,11 @@ a:hover {
 }
 
 #table {
-  height: calc(100vh - 320px);
-  overflow-y: scroll;
+  height: calc(100vh - 350px);
 }
 
 #table .ant-table-content {
-  height: calc(100vh - 320px);
+  height: calc(100vh - 350px);
 }
 
 .ant-transfer-list-content {

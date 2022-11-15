@@ -14,13 +14,13 @@ export const fileDataSlice = createSlice({
     },
     deleteFile: (state: AllFiles) => {
       // 将文件从全局状态管理树上移除
-      console.log('删除数据,开发中', state);
     },
     updateColField: (
       state: AllFiles,
       action: { payload: { index: number; data: Array<ColField> } }
     ) => {
       const { payload: { index, data } } = action;
+      console.log('玛德这个数据是什么', data);
       state[index].allColFields = [...data];
     },
     updateRowData: (
@@ -40,4 +40,3 @@ export const { addFile, deleteFile, updateColField, updateRowData } =
   fileDataSlice.actions;
 export const selectFileState = (state: RootState) => state.fileData;
 export default fileDataSlice.reducer;
-``;
