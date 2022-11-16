@@ -1,41 +1,40 @@
-import { Space } from 'antd';
-import { Button, Popconfirm, Table } from 'antd';
-import type { FormInstance } from 'antd/es/form';
+import { Popconfirm, Table } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'renderer/store';
 import { DataType, TableTitle } from './types';
 import { json2xlsx } from 'utils/fileHandler';
-import { RowData } from 'renderer/store/reducers/types';
-import { updateRowData } from 'renderer/store/reducers/fileDataReducer';
+import { OneFile, RowData } from 'renderer/store/reducers/types';
 import { useAppDispatch } from 'renderer/hooks/store';
-import { TotalResultModal } from '../Modals/TotalResultModal';
 import { EditableCell } from './EditableCell';
 import { EditableRow } from './EditableRow';
 
 type EditableTableProps = Parameters<typeof Table>[0];
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
-export const TotalResultTable = () => {
+interface Props {
+  totalData: OneFile,
+};
+
+// TODO: 这个模块的核心思想是, 利用state做响应的数据视图渲染, 所有改动完毕后, 确认是否保存若确认才同步
+export const TotalResultTable = ({ totalData }: Props) => {
   const allFiles = useSelector((state: RootState) => state.fileData);
-  const activeFile = useSelector((state: RootState) => state.activeFile);
   const dispatch: AppDispatch = useAppDispatch();
+
   const [dataSource, setDataSource] = useState<Array<DataType>>([]);
   const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
-  const [isShowTotalResultModal, setIsShowTotalResultModal] = useState<boolean>(false);
   const tableRef = useRef<any>();
+
   // 获取当前active的文件内容
   const generateTableRows = () => {
-    if(activeFile.index < 0) {
-      return ;
-    }
     const newDataSource: Array<DataType> = [];
-    allFiles[activeFile.index]?.allRows.forEach((oneRow, index) => {
+    totalData?.allRows.forEach((oneRow, index) => {
       newDataSource.push({
         key: `${index}`,
         ...oneRow,
       })
-    })
+    });
+    console.log('total', newDataSource);
     setDataSource(newDataSource);
   }
 
@@ -46,7 +45,7 @@ export const TotalResultTable = () => {
         dataIndex: '操作',
         onCell: () => {
           return {
-            constant: false
+            constant: false,
           }
         },
         render: (_: any, record: { key: React.Key }) => {
@@ -62,7 +61,7 @@ export const TotalResultTable = () => {
     ];
 
     const formatedDataFields: Array<TableTitle> = [];
-    allFiles[activeFile.index]?.allColFields.forEach((oneField) => {
+    totalData?.allColFields.forEach((oneField) => {
       if (!oneField.disable) {
         formatedDataFields.push({
           title: oneField.name,
@@ -77,20 +76,20 @@ export const TotalResultTable = () => {
           },
         })
       }
-    })
-
+    });
+    console.log('total-column', formatedDataFields)
     setTableColumns([
       ...formatedDataFields,
       ...operationFields
-    ])
-  }
+    ]);
+  };
 
   useEffect(() => {
     generateTableCols();
-  }, [activeFile.index, activeFile!.lastModify, dataSource])
+  }, [totalData, dataSource]);
   useEffect(() => {
     generateTableRows();
-  }, [activeFile.index, activeFile!.lastModify])
+  }, [totalData]);
 
   const handleDelete = (key: React.Key) => {
     let newData = dataSource.filter((oneData: DataType) => oneData.key != key)
@@ -118,9 +117,9 @@ export const TotalResultTable = () => {
   const handleExport = () => {
     // // 筛选出启用的字段
     const rows: Array<RowData> = [];
-    allFiles[activeFile.index].allRows.forEach((oneRow) => {
+    totalData?.allRows.forEach((oneRow) => {
       const nonDisablePart: RowData = {};
-      allFiles[activeFile.index]?.allColFields.forEach((oneCol) => {
+      totalData?.allColFields.forEach((oneCol) => {
         if (!oneCol.disable) {
           nonDisablePart[oneCol.name] = oneRow[oneCol.name];
         }
@@ -149,8 +148,8 @@ export const TotalResultTable = () => {
         bordered
         dataSource={dataSource}
         columns={tableColumns as ColumnTypes}
-        scroll={{ x:  300 +  80 * tableColumns.length, y: 460 }}
-        className={'mt-2 '}
+        scroll={{ x:  300 +  80 * tableColumns.length, y: 420 }}
+        className={'mt-2'}
         tableLayout={'fixed'}
         pagination={false}
       >

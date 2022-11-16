@@ -1,13 +1,13 @@
-import { Upload, Button } from "antd"
+import { Upload, Button } from "antd";
 import { useSelector } from "react-redux";
-import { useAppDispatch, useAppSelector } from "renderer/hooks/store";
+import { useAppDispatch } from "renderer/hooks/store";
 import { AppDispatch, RootState } from "renderer/store";
-import { addFile, deleteFile, updateColField, updateRowData } from "renderer/store/reducers/fileDataReducer";
+import { addFile } from "renderer/store/reducers/fileDataReducer";
 import { getKeys } from "utils/excel";
-import { xlsx2json } from "utils/fileHandler"
+import { xlsx2json } from "utils/fileHandler";
 
 interface ExcelData {
-  [key: string]: any
+  [key: string]: any,
 }
 
 export const FileReaderButton = () => {
@@ -17,9 +17,6 @@ export const FileReaderButton = () => {
   const storeData = async (file: File) => {
     const allRows = await xlsx2json(file);
     const allColFields = getKeys(allRows, file.name);
-    // if (allFiles.length === 0) {
-    //   dispatch(addFile({id: '总表', allRows, allColFields}));
-    // }
     dispatch(addFile({id: file.name, allRows, allColFields}));
   }
 
@@ -45,9 +42,7 @@ export const FileReaderButton = () => {
   //     })
   //   }
   // }
-
   // useEffect(refreshTotalExcleFileData, [allFiles.length, activeFile.id]);
-
 
   return (
     <div id="xlsx-file-upload" className="px-2">

@@ -3,13 +3,15 @@ import { Modal } from "antd";
 import { RootState } from "renderer/store";
 import { useSelector } from "react-redux";
 import { TotalResultTable } from '../Tables/TotalResultTable';
+import { OneFile } from "renderer/store/reducers/types";
 
 interface Props {
-  isShow: boolean;
-  setIsShow: (flag: boolean) => void;
+  isShow: boolean,
+  setIsShow: (flag: boolean) => void,
+  totalData: OneFile,
 }
 
-export const TotalResultModal = ({isShow, setIsShow}: Props) => {
+export const TotalResultModal = ({isShow, setIsShow, totalData}: Props) => {
   const allFiles = useSelector((state: RootState) => state.fileData);
   const activeFile = useSelector((state: RootState) => state.activeFile);
 
@@ -30,8 +32,11 @@ export const TotalResultModal = ({isShow, setIsShow}: Props) => {
         onOk={() => { handleOk() }}
         onCancel={() => { handleClose() }}
         width={1000}
+        maskClosable={false}
+        keyboard={false}
+        okText={'确认导出'}
       >
-        <TotalResultTable></TotalResultTable>
+        <TotalResultTable totalData={totalData}></TotalResultTable>
       </Modal>
     </>
   )

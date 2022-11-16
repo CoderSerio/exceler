@@ -1,17 +1,18 @@
-import { InputRef, Space } from 'antd';
-import { Button, Form, Input, Popconfirm, Table } from 'antd';
+import { Space } from 'antd';
+import { Button, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/es/form';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'renderer/store';
-import { DataType, EditableCellProps, EditableRowProps, TableTitle, WbSheet } from './types';
+import { DataType, TableTitle } from './types';
 import { json2xlsx } from 'utils/fileHandler';
-import { RowData } from 'renderer/store/reducers/types';
+import { OneFile, RowData } from 'renderer/store/reducers/types';
 import { updateRowData } from 'renderer/store/reducers/fileDataReducer';
 import { useAppDispatch } from 'renderer/hooks/store';
 import { TotalResultModal } from '../Modals/TotalResultModal';
 import { EditableRow } from './EditableRow';
 import { EditableCell } from './EditableCell';
+import { generateTotalExcelFile } from 'utils/excel';
 
 export const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -25,6 +26,7 @@ export const EditableTable = () => {
   const [dataSource, setDataSource] = useState<Array<DataType>>([]);
   const [tableColumns, setTableColumns] = useState<Array<TableTitle>>([]);
   const [isShowTotalResultModal, setIsShowTotalResultModal] = useState<boolean>(false);
+  const [allInOneFileData, setAllInOneFileData] = useState<OneFile>();
   const tableRef = useRef<any>();
   // 获取当前active的文件内容
   const generateTableRows = () => {
@@ -135,7 +137,9 @@ export const EditableTable = () => {
     json2xlsx(rows);
   }
 
-  const computTotalResult = () => {
+  const computTotalResult = async () => {
+    const allInOneFile = await generateTotalExcelFile(allFiles, tableColumns);
+    setAllInOneFileData(allInOneFile);
     setIsShowTotalResultModal(true);
   }
 
@@ -150,6 +154,7 @@ export const EditableTable = () => {
     <div className='p-2'>
       <TotalResultModal
         isShow={isShowTotalResultModal}
+        totalData={allInOneFileData as OneFile}
         setIsShow={(flag: boolean) => {setIsShowTotalResultModal(flag)}}></TotalResultModal>
       <Space>
         <Button onClick={() => {computTotalResult()}} type="primary" style={{ height: '40px' }}>
@@ -161,6 +166,10 @@ export const EditableTable = () => {
         <Button onClick={() => {handleExport()}} type="primary" style={{ height: '40px' }}>
           导出数据
         </Button>
+        <Button onClick={() => {
+          console.log(dataSource, tableColumns)
+          console.log('all', allFiles)
+        }} type="primary" style={{ height: '40px' }}>测试专用</Button>
       </Space>
       <Table
         ref={tableRef}

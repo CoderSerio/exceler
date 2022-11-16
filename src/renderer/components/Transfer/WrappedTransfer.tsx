@@ -99,6 +99,7 @@ export const WrappedTransfer = () => {
     // 刷新更时间, 触发副作用更新
     dispatch(modifyActiveFile(`${new Date()}`));
     setTargetKeys(checkedFieldsKeys);
+    console.log('发生交换后, 总的状态改变情况', allFiles);
   };
 
   const handleSearch = (dir: TransferDirection, value: string) => {
