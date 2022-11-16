@@ -1,4 +1,4 @@
-import { Popconfirm, Table } from 'antd';
+import { Button, Popconfirm, Space, Table } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'renderer/store';
@@ -115,9 +115,9 @@ export const TotalResultTable = ({ totalData }: Props) => {
   };
 
   const handleExport = () => {
-    // // 筛选出启用的字段
+    // 筛选出启用的字段
     const rows: Array<RowData> = [];
-    totalData?.allRows.forEach((oneRow) => {
+    dataSource.forEach((oneRow) => {
       const nonDisablePart: RowData = {};
       totalData?.allColFields.forEach((oneCol) => {
         if (!oneCol.disable) {
@@ -140,9 +140,17 @@ export const TotalResultTable = ({ totalData }: Props) => {
 
   return (
     <div>
+      <Space>
+        {/* <Button onClick={() => {handleAdd()}} type="primary" style={{ height: '40px' }}>
+          添加数据
+        </Button> */}
+        <Button onClick={() => {handleExport()}} type="primary" style={{ height: '40px' }}>
+          导出数据
+        </Button>
+      </Space>
       <Table
         ref={tableRef}
-        id='table'
+        id='totalTable'
         components={components}
         rowClassName={() => 'editable-row'}
         bordered

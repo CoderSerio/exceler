@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { WrappedTransfer } from 'renderer/components/Transfer/WrappedTransfer';
 import { FileReaderButton } from 'renderer/components/Buttons/FileReaderButton';
-// import { InputButton } from 'renderer/components/Buttons/InputButton';
-import { LayoutedTable } from 'renderer/components/Tables/LayoutedTable';
 import { FileNamesButton } from 'renderer/components/Buttons/FileNamesButton';
 import { TemplateTable } from 'renderer/components/Tables/TemplateTable';
 import { FieldAddButton } from 'renderer/components/Buttons/FieldAddButton';
+import { EditableTable } from 'renderer/components/Tables/EditableTable';
 
 
 export const Home = () => {
@@ -23,13 +22,12 @@ export const Home = () => {
         </div>
         <div className='px-2' id='content-body'>
           <div className='p-2 relative'>
-            {/* <InputButton></InputButton> */}
             <FieldAddButton></FieldAddButton>
             <TemplateTable></TemplateTable>
             <WrappedTransfer></WrappedTransfer>
           </div>
           <div>
-            <LayoutedTable></LayoutedTable>
+            <EditableTable></EditableTable>
           </div>
         </div>
       </div>

@@ -11,13 +11,14 @@ export const RouterTab = ({extraRouters = []}:Props) => {
 
   return (
     <div>
-      <div className='fixed top-0 w-full h-10 bg-[#fff] flex place-content-around z-10 drop-shadow-md'>
+      {/* 由于缓存问题暂时没有一个好的解决方案, 所以暂时不启用缓存机制 */}
+      {/* <div className='fixed top-0 w-full h-10 bg-[#fff] flex place   -content-around z-10 drop-shadow-md'>
         {allRoutes.map((route) => {
           return (
             <NavLink to={route.path} key={route.name}>{route.name}</NavLink>
           )
         })}
-      </div>
+      </div> */}
       <div className='h-12'></div>
       <div className='m-t-10'>
         <Routes>

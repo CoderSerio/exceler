@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal } from "antd";
+import { Button, Modal, Space } from "antd";
 import { RootState } from "renderer/store";
 import { useSelector } from "react-redux";
 import { TotalResultTable } from '../Tables/TotalResultTable';
@@ -34,7 +34,8 @@ export const TotalResultModal = ({isShow, setIsShow, totalData}: Props) => {
         width={1000}
         maskClosable={false}
         keyboard={false}
-        okText={'确认导出'}
+        okText={false}
+        cancelText={'取消'}
       >
         <TotalResultTable totalData={totalData}></TotalResultTable>
       </Modal>

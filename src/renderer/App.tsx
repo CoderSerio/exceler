@@ -1,6 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import "tailwindcss/tailwind.css";
-import icon from '../../assets/icon.svg';
 import { RouterTab } from './components/Tabs/RouterTab';
 
 
